@@ -8,7 +8,7 @@ import type HighlightRange from '@src/model/range';
 import type { PainterOptions, HookMap } from '@src/types';
 import HighlightSource from '@src/model/source';
 import { wrapHighlight, getSelectedNodes, normalizeSiblingText } from '@src/painter/dom';
-import { getHighlightsByRoot, forEach, addClass, removeAllClass } from '@src/util/dom';
+import { getHighlightsByRoot, forEach, addClass, removeAllClass, removeClass } from '@src/util/dom';
 import { ERROR } from '@src/types';
 import { initDefaultStylesheet } from '@src/painter/style';
 import {
@@ -115,6 +115,8 @@ export default class Painter {
         const $idToUpdate: HTMLElement[] = [];
         // nodes to update extra id
         const $extraToUpdate: HTMLElement[] = [];
+        // nodes to only remove main id and classes
+        const $classesToUpdate: HTMLElement[] = [];
 
         for (const $s of $spans) {
             const spanId = $s.dataset[CAMEL_DATASET_IDENTIFIER];
@@ -122,7 +124,11 @@ export default class Painter {
 
             // main id is the target id and no extra ids --> to remove
             if (spanId === id && !spanExtraIds) {
-                $toRemove.push($s);
+                if ($s.classList.contains('noteSign4Element')) {
+                    $classesToUpdate.push($s);
+                } else {
+                    $toRemove.push($s);
+                }
             }
             // main id is the target id but there is some extra ids -> update main id & extra id
             else if (spanId === id) {
@@ -180,7 +186,18 @@ export default class Painter {
             hooks.Remove.UpdateNodes.call(id, $s, 'extra-update');
         });
 
-        return $toRemove.length + $idToUpdate.length + $extraToUpdate.length !== 0;
+        $classesToUpdate.forEach($s => {
+            removeClass($s, 'noteSign');
+            removeClass($s, 'noteSign4Element');
+            removeClass($s, 'background-pink');
+            removeClass($s, 'background-yellow');
+            removeClass($s, 'background-blue');
+            // FIXME mode classes
+            $s.dataset[CAMEL_DATASET_IDENTIFIER] = '';
+            hooks.Remove.UpdateNodes.call(id, $s, 'classes-update');
+        });
+
+        return $toRemove.length + $idToUpdate.length + $extraToUpdate.length + $classesToUpdate.length !== 0;
     }
 
     removeAllHighlight() {

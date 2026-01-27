@@ -1,15 +1,14 @@
 import type HighlightRange from '@src/model/range';
-import type { SelectedNode, DomNode } from '@src/types';
-import { SplitType, SelectedNodeType } from '@src/types';
-import { hasClass, addClass as addElementClass, isHighlightWrapNode, removeAllClass } from '@src/util/dom';
+import { DomNode, SelectedNode, SelectedNodeType, SplitType } from '@src/types';
+import { addClass as addElementClass, hasClass, isHighlightWrapNode, removeAllClass } from '@src/util/dom';
 import {
-    ID_DIVISION,
-    getDefaultOptions,
     CAMEL_DATASET_IDENTIFIER,
     CAMEL_DATASET_IDENTIFIER_EXTRA,
     DATASET_IDENTIFIER,
-    DATASET_SPLIT_TYPE,
     DATASET_IDENTIFIER_EXTRA,
+    DATASET_SPLIT_TYPE,
+    getDefaultOptions,
+    ID_DIVISION,
 } from '../util/const';
 import { unique } from '../util/tool';
 
@@ -104,7 +103,7 @@ export const getSelectedNodes = (
 
     while ((curNode = nodeStack.pop())) {
         // do not traverse the excepted node
-        if (curNode.nodeType === 1 && isExcepted(curNode as HTMLElement)) {
+        if (isExcepted(curNode as HTMLElement)) {
             continue;
         }
 
@@ -114,8 +113,23 @@ export const getSelectedNodes = (
             nodeStack.push(children[i]);
         }
 
-        // only collect text nodes
+        // only collect text nodes and selected element nodes
+        // TODO refactor
+        // FIXME left right problem
         if (curNode === $startNode) {
+            // element node
+            if (
+                curNode.nodeType === 1 &&
+                ((curNode as HTMLElement).classList.contains('MathJax_CHTML') ||
+                    (curNode as HTMLElement).classList.contains('mjx-chtml'))
+            ) {
+                selectedNodes.push({
+                    $node: curNode as HTMLElement,
+                    type: SelectedNodeType.span,
+                    splitType: SplitType.head,
+                });
+            }
+            // text node
             if (curNode.nodeType === 3) {
                 (curNode as Text).splitText(startOffset);
 
@@ -131,6 +145,18 @@ export const getSelectedNodes = (
             // meet the start-node (begin to traverse)
             withinSelectedRange = true;
         } else if (curNode === $endNode) {
+            // element node
+            if (curNode.nodeType === 1 &&
+                ((curNode as HTMLElement).classList.contains('MathJax_CHTML') ||
+                    (curNode as HTMLElement).classList.contains('mjx-chtml'))
+            ) {
+                selectedNodes.push({
+                    $node: curNode as HTMLElement,
+                    type: SelectedNodeType.span,
+                    splitType: SplitType.tail,
+                });
+            }
+            // text node
             if (curNode.nodeType === 3) {
                 const node = curNode as Text;
 
@@ -146,12 +172,26 @@ export const getSelectedNodes = (
             break;
         }
         // handle text nodes between the range
-        else if (withinSelectedRange && curNode.nodeType === 3) {
-            selectedNodes.push({
-                $node: curNode as Text,
-                type: SelectedNodeType.text,
-                splitType: SplitType.none,
-            });
+        else if (withinSelectedRange) {
+            // element node
+            if (curNode.nodeType === 1 &&
+                ((curNode as HTMLElement).classList.contains('MathJax_CHTML') ||
+                    (curNode as HTMLElement).classList.contains('mjx-chtml'))
+            ) {
+                selectedNodes.push({
+                    $node: curNode as HTMLElement,
+                    type: SelectedNodeType.span,
+                    splitType: SplitType.none,
+                });
+            }
+            // text node
+            if (curNode.nodeType === 3) {
+                selectedNodes.push({
+                    $node: curNode as Text,
+                    type: SelectedNodeType.text,
+                    splitType: SplitType.none,
+                });
+            }
         }
     }
 
@@ -294,6 +334,7 @@ const wrapOverlapNode = (selected: SelectedNode, range: HighlightRange, classNam
  *  - wrapping a whole new node (without any wrapper)
  *  - wrapping part of the node
  *  - wrapping the whole wrapped node
+ *  FIXME parent
  */
 export const wrapHighlight = (
     selected: SelectedNode,
@@ -304,6 +345,17 @@ export const wrapHighlight = (
     const $parent = selected.$node.parentNode as HTMLElement;
     const $prev = selected.$node.previousSibling;
     const $next = selected.$node.nextSibling;
+
+    if (selected.type === SelectedNodeType.span) {
+        // selected.type === SelectedNodeType.span => element only
+        addClass($parent, className);
+        addClass($parent, 'noteSign4Element');
+        $parent.setAttribute(`data-${DATASET_IDENTIFIER}`, range.id);
+        $parent.setAttribute(`data-${DATASET_SPLIT_TYPE}`, selected.splitType);
+        $parent.setAttribute(`data-${DATASET_IDENTIFIER_EXTRA}`, '');
+        return $parent;
+    }
+    // selected.type === SelectedNodeType.text => text only
 
     let $wrap: HTMLElement;
 
