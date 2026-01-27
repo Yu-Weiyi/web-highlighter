@@ -2,19 +2,18 @@
 /**
  * config for building example bundle (homepage)
  */
-const {staticDirname, examplePath} = require('./paths.js');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const merge = require('webpack-merge');
+const { staticDirname, examplePath } = require('./paths.js');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const { merge } = require('webpack-merge');
 const baseConfig = require('./base.example.config');
 
 const config = {
     mode: 'production',
-    plugins: [
-        new CleanWebpackPlugin([staticDirname], {root: examplePath})
-    ],
+    plugins: [new CleanWebpackPlugin()],
     output: {
-        filename: 'index.[contenthash:8].js'
-    }
+        filename: 'index.[contenthash:8].js',
+        clean: true,
+    },
 };
 
 module.exports = merge(baseConfig, config);
