@@ -126,8 +126,8 @@ export const getSelectedNodes = (
             if (
                 curNode.nodeType === 1 &&
                 ((curNode as HTMLElement).classList.contains('MathJax_CHTML') ||
-                    (curNode as HTMLElement).classList.contains('mjx-chtml')) ||
-                    (curNode as HTMLElement).classList.contains('MJXc-display')
+                    (curNode as HTMLElement).classList.contains('mjx-chtml') ||
+                    (curNode as HTMLElement).classList.contains('MJXc-display'))
             ) {
                 selectedNodes.push({
                     $node: curNode as HTMLElement,
@@ -184,7 +184,7 @@ export const getSelectedNodes = (
                     if (
                         (equationRootElement as HTMLElement).classList.contains('MathJax_CHTML') ||
                         (equationRootElement as HTMLElement).classList.contains('mjx-chtml') ||
-                        (curNode as HTMLElement).classList.contains('MJXc-display')
+                        (equationRootElement as HTMLElement).classList.contains('MJXc-display')
                     ) {
                         // found equation root element
                         equationRootElementFlag = true;
@@ -240,8 +240,8 @@ export const getSelectedNodes = (
             // element node
             if (curNode.nodeType === 1 &&
                 ((curNode as HTMLElement).classList.contains('MathJax_CHTML') ||
-                    (curNode as HTMLElement).classList.contains('mjx-chtml')) ||
-                (curNode as HTMLElement).classList.contains('MJXc-display')
+                    (curNode as HTMLElement).classList.contains('mjx-chtml') ||
+                    (curNode as HTMLElement).classList.contains('MJXc-display'))
             ) {
                 selectedNodes.push({
                     $node: curNode as HTMLElement,
@@ -269,8 +269,10 @@ export const getSelectedNodes = (
             // element node
             if (curNode.nodeType === 1 &&
                 ((curNode as HTMLElement).classList.contains('MathJax_CHTML') ||
-                    (curNode as HTMLElement).classList.contains('mjx-chtml')) ||
-                (curNode as HTMLElement).classList.contains('MJXc-display')
+                    (curNode as HTMLElement).classList.contains('mjx-chtml') ||
+                    (curNode as HTMLElement).classList.contains('MJXc-display')
+                )
+
             ) {
                 selectedNodes.push({
                     $node: curNode as HTMLElement,
