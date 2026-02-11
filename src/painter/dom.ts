@@ -126,7 +126,8 @@ export const getSelectedNodes = (
             if (
                 curNode.nodeType === 1 &&
                 ((curNode as HTMLElement).classList.contains('MathJax_CHTML') ||
-                    (curNode as HTMLElement).classList.contains('mjx-chtml'))
+                    (curNode as HTMLElement).classList.contains('mjx-chtml')) ||
+                    (curNode as HTMLElement).classList.contains('MJXc-display')
             ) {
                 selectedNodes.push({
                     $node: curNode as HTMLElement,
@@ -182,7 +183,8 @@ export const getSelectedNodes = (
                     equationRootElement = equationRootElement.parentElement as HTMLElement;
                     if (
                         (equationRootElement as HTMLElement).classList.contains('MathJax_CHTML') ||
-                        (equationRootElement as HTMLElement).classList.contains('mjx-chtml')
+                        (equationRootElement as HTMLElement).classList.contains('mjx-chtml') ||
+                        (curNode as HTMLElement).classList.contains('MJXc-display')
                     ) {
                         // found equation root element
                         equationRootElementFlag = true;
@@ -238,7 +240,8 @@ export const getSelectedNodes = (
             // element node
             if (curNode.nodeType === 1 &&
                 ((curNode as HTMLElement).classList.contains('MathJax_CHTML') ||
-                    (curNode as HTMLElement).classList.contains('mjx-chtml'))
+                    (curNode as HTMLElement).classList.contains('mjx-chtml')) ||
+                (curNode as HTMLElement).classList.contains('MJXc-display')
             ) {
                 selectedNodes.push({
                     $node: curNode as HTMLElement,
@@ -266,7 +269,8 @@ export const getSelectedNodes = (
             // element node
             if (curNode.nodeType === 1 &&
                 ((curNode as HTMLElement).classList.contains('MathJax_CHTML') ||
-                    (curNode as HTMLElement).classList.contains('mjx-chtml'))
+                    (curNode as HTMLElement).classList.contains('mjx-chtml')) ||
+                (curNode as HTMLElement).classList.contains('MJXc-display')
             ) {
                 selectedNodes.push({
                     $node: curNode as HTMLElement,
@@ -432,12 +436,15 @@ export const wrapHighlight = (
     className: string[] | string,
     wrapTag: string,
 ): HTMLElement => {
-    const $parent = selected.$node.parentNode as HTMLElement;
+    let $parent = selected.$node.parentNode as HTMLElement;
     const $prev = selected.$node.previousSibling;
     const $next = selected.$node.nextSibling;
-
     if (selected.type === SelectedNodeType.span) {
         // selected.type === SelectedNodeType.span => element only
+        let node = selected.$node as HTMLElement;
+        if (node.classList && (node.classList.contains("MathJax_CHTML") || node.classList.contains("mjx-chtml") || node.classList.contains("MJXc-display"))) {
+            $parent = node
+        }
         addClass($parent, className);
         addClass($parent, 'noteSign4Element');
         $parent.setAttribute(`data-${DATASET_IDENTIFIER}`, range.id);
