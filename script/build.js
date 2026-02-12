@@ -4,7 +4,9 @@ if (process.env.target === 'example') {
 }
 
 const webpack = require('webpack');
+// const configPath = process.env.target === 'example' ? '../config/webpack.config.example.js' : '../config/webpack.config.prod.js';
 const configPath = process.env.target === 'example' ? '../config/webpack.config.example.js' : '../config/webpack.config.prod.js';
+console.log(configPath);
 const config = require(configPath);
 webpack(config, (err, stats) => {
     if (err || stats.hasErrors() || stats.hasWarnings()) {

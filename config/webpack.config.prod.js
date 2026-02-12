@@ -14,11 +14,14 @@ const repository = pkg.repository.url;
 const bannerInfo = `${name} v${version} ${repository}`;
 
 const config = {
-    mode: 'production',
+    mode: 'none',
     devtool: 'source-map',
     output: {
         filename: 'web-highlighter.min.js',
         clean: true,
+    },
+    optimization: {
+        minimize: false,
     },
     plugins: [new webpack.BannerPlugin(bannerInfo)],
 };
