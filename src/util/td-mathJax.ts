@@ -81,7 +81,7 @@ export function getAllRootChildrenNodeList(curNode: HTMLElement): SelectedNode[]
         const children = curNode_1.childNodes;
         for (let i = children.length - 1; i >= 0; i--) {
 
-            if (children[i].parentNode === null) {
+            if (children[i].parentNode === null || children[i].parentElement.classList.contains('MJX_Assistive_MathML') ) {
                 continue;
             }
 
