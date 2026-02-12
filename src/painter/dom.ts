@@ -265,6 +265,11 @@ export const getSelectedNodes = (
             // meet the start-node (begin to traverse)
             withinSelectedRange = true;
         } else if (curNode === $endNode) {
+            if (isInMathJax(curNode)) {
+                // 防止重复添加
+                break;
+            }
+
             // element node
             if (curNode.nodeType === 1 &&
                 ((curNode as HTMLElement).classList.contains('MathJax_CHTML') ||
