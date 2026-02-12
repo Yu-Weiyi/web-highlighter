@@ -118,6 +118,9 @@ export const getSelectedNodes = (
             nodeStack.push(children[i]);
         }
 
+        if(withinSelectedRange){
+            console.log('----------------------------------------------------------mimi');
+        }
         // only collect text nodes and selected element nodes
         // TODO refactor
         // FIXME left right problem
@@ -137,47 +140,58 @@ export const getSelectedNodes = (
             }
 
             // If start node is not equation root but is in equation span element, add the root element into selected nodes.
-            if (curNode.nodeType === 3 && (
-                (curNode.parentElement as HTMLElement).classList.contains('MathJax') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('MJXc-display') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-container') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-math') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-mrow') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-mi') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-mo') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-mn') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-msub') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-msup') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-msubsup') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-mfrac') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-mroot') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-msqrt') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-mstyle') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-annotation') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-semantics') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('math') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('semantics') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mrow') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mi') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mo') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mn') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('msub') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('msup') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('msubsup') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mfrac') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mroot') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('msqrt') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mstyle') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('annotation') ||
-                    (curNode.parentElement as HTMLElement).classList.contains('mjx-char')
-            )) {
-                console.log('----=-=---==-=--=-=- search equation root:')
+            if (
+                // text
+                (curNode.nodeType === 3 &&
+                    ((curNode.parentElement as HTMLElement).classList.contains('MathJax') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('MJXc-display') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-container') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-math') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-char') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-mrow') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-mi') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-mo') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-mn') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-msub') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-msup') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-msubsup') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-mfrac') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-mroot') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-msqrt') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-mstyle') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-annotation') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-semantics') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-strut') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mjx-mtext') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('MJXc-TeX-main-R') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('math') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('semantics') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mrow') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mi') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mo') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mn') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('msub') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('msup') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('msubsup') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mfrac') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mroot') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('msqrt') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('mstyle') ||
+                        (curNode.parentElement as HTMLElement).classList.contains('annotation')
+                    )
+                )
+                        ||
+                        // element
+                        (curNode.nodeType === 1 && (curNode as HTMLElement).classList.contains('mjx-strut'))
+
+            ){
+                console.log('----=-=---==-=--=-=- search equation root:');
                 let equationRootElement = curNode as HTMLElement;
                 let equationRootElementFlag = false;
                 while (true) {
                     if (curNode.parentElement == null || curNode.parentElement == undefined) {
                         equationRootElementFlag = false;
-                        console.log('equationRootElementFlag = false;')
+                        console.log('equationRootElementFlag = false;');
                         break;
                     }
                     equationRootElement = equationRootElement.parentElement as HTMLElement;
@@ -188,7 +202,7 @@ export const getSelectedNodes = (
                     ) {
                         // found equation root element
                         equationRootElementFlag = true;
-                        console.log('equationRootElementFlag = true;')
+                        console.log('equationRootElementFlag = true;');
                         console.log(equationRootElement);
                         break;
                     }

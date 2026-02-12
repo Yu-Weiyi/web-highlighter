@@ -83,12 +83,19 @@ export const formatDomNode = (n: DomNode): DomNode => {
         n.$node.nodeType === 4 ||
         // Comment
         n.$node.nodeType === 8
+        // Element
+        // n.$node.nodeType === 1
     ) {
         return n;
     }
 
+    // element
+    let tempNode = n.$node
+    while (tempNode.nodeType !== 3 && tempNode.nodeType !== 4 && tempNode.nodeType !== 8 && tempNode.childNodes.length > 0) {
+           tempNode = tempNode.childNodes[0];
+    }
     return {
-        $node: n.$node.childNodes[n.offset],
+        $node: tempNode,
         offset: 0,
     };
 };
