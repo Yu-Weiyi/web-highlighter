@@ -57,6 +57,11 @@ export default class Painter {
         }
 
         return $selectedNodes.map(n => {
+
+            if(n.$node.parentNode === null){
+                return n.$node as HTMLElement;
+            }
+
             let $node = wrapHighlight(n, range, className, this.options.wrapTag);
 
             if (!hooks.Render.WrapNode.isEmpty()) {
